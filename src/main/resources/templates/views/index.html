@@ -1,0 +1,76 @@
+
+<!-- head.html -->
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{comm/head :: head}"></head>
+<body>
+<div th:replace="~{comm/side :: side}"></div>
+
+<div class="main">
+    <div th:replace="~{comm/nav :: nav}"></div>
+
+    <h3 class="separator">
+        Blog Posts
+    </h3>
+
+    <div class="blog-posts-wrapper">
+        <div class="blog-posts" id="post-container">
+            <!-- newPost.html로 이동하는 버튼 -->
+            <div class="item new-post" onclick="openModal('/post/newPost', true)">
+                <i class="ri-add-line"></i>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="icon-bar">
+        <i class="ri-skip-left-line disabled"></i>
+        <i class="ri-skip-right-line disabled"></i>
+    </div>
+
+    <h3 class="separator">
+        Most Viewed
+    </h3>
+
+    <table class="most-viewed-table">
+        <tbody class="post-table-body">
+
+            <!-- 조회수가 많은 게시물 3개 -->
+            <tr class="most-viewed-post"></tr>
+            <tr class="most-viewed-post"></tr>
+            <tr class="most-viewed-post"></tr>
+
+        </tbody>
+    </table>
+
+    <h3 class="separator">
+        Recent Views
+    </h3>
+
+    <table class="recent-viewed-table">
+        <tbody class="post-table-body">
+
+        <!-- 최근 본 게시물 2개 -->
+        <tr class="recent-post"></tr>
+        <tr class="recent-post"></tr>
+
+        </tbody>
+    </table>
+
+</div>
+
+<!-- 공통 모달 구조 -->
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <div id="iframe-container"></div>
+    </div>
+</div>
+
+</body>
+
+<script th:src="@{/js/modal.js}"></script>
+<script th:src="@{/js/index.js}"></script>
+<script th:src="@{/js/auth.js}"></script>
+
+</html>
