@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body th:fragment="side">
+<div class="left-container">
+    <div class="left-section">
+
+        <div class="sidebar">
+            <h2>My HomePage</h2>
+            <div class="item active" data-category="ALL">
+                <i class="ri-apps-line"></i>
+                <h3>전체</h3>
+            </div>
+            <div class="item" data-category="MOVIE">
+                <i class="ri-movie-line"></i>
+                <h3>영화</h3>
+            </div>
+            <div class="item" data-category="BOOK">
+                <i class="ri-book-line"></i>
+                <h3>책</h3>
+            </div>
+            <div class="item" data-category="RECIPE">
+                <i class="ri-restaurant-line"></i>
+                <h3>음식</h3>
+            </div>
+            <div class="item" data-category="GAME">
+                <i class="ri-game-line"></i>
+                <h3>게임</h3>
+            </div>
+            <div class="item" data-category="MUSIC">
+                <i class="ri-music-line"></i>
+                <h3>음악</h3>
+            </div>
+            <div class="item" data-category="SECRET">
+                <i class="ri-folder-shield-line"></i>
+                <h3>비밀</h3>
+            </div>
+
+        </div>
+
+        <div class="sign_wrapper">
+            <div id="login-section" class="sign sign-in" onclick="openModal('/sign/login')">
+                <i class="ri-logout-box-r-line"></i>
+                <h3>로그인</h3>
+            </div>
+            <div id="signup-section" class="sign sign-up" onclick="openModal('/sign/signup')">
+                <i class="ri-user-add-line"></i>
+                <h3>회원 가입</h3>
+            </div>
+            <div id="logout-section" class="sign sign-out" onclick="handleLogout()">
+                <i class="ri-logout-box-line"></i>
+                <h3>로그 아웃</h3>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    document.querySelectorAll('.item').forEach(item => {
+        item.addEventListener('click', function() {
+            // 모든 아이템의 'active' 클래스 제거
+            document.querySelectorAll('.item').forEach(el => el.classList.remove('active'));
+
+            // 현재 클릭된 아이템에 'active' 클래스 추가
+            this.classList.add('active');
+
+            // 카테고리 가져오기
+            const category = this.getAttribute('data-category');
+
+            // 게시물 로드 함수 호출
+            loadPosts(category);
+        });
+    });
+
+</script>
+</body>
+
+</html>

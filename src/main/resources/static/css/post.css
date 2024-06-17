@@ -1,0 +1,311 @@
+/* 기본 스타일 설정 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+body {
+    display: flex;
+    height: 100vh;
+    background: #f0f5fd;
+}
+
+.main {
+    flex-grow: 1;
+    padding: 25px;
+    overflow-y: auto;
+}
+
+.main .post-content {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(136, 148, 171, 0.2), 0 24px 20px -24px rgba(71, 82, 107, 0.1);
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.main .post-title {
+    font-size: 28px;
+    margin-bottom: 15px;
+    color: #364670;
+    border-radius: 5px;
+}
+
+/* input[type="text" i] */
+.main input.post-title {
+    color: rgba(54, 70, 112, 0.4); /* 70% 불투명도로 변경 */
+}
+
+.main .post-meta {
+    font-size: 16px;
+    color: #999;
+    margin-bottom: 25px;
+}
+
+.main .post-body {
+    font-size: 18px;
+    color: #364670;
+    margin-bottom: 25px;
+}
+
+.post-image {
+    max-width: 65%;
+    height: auto;
+    margin-bottom: 20px;
+    border-radius: 10px;
+}
+
+.post-image-container {
+    position: relative;
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.post-image-placeholder {
+    font-size: 100px;
+    color: rgba(54, 70, 112, 0.4);
+}
+
+.post-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.post-actions .btn-edit,
+.post-actions .btn-delete,
+.post-actions .btn-cancel {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s ease;
+}
+
+.post-actions .btn-edit {
+    background: #1976d2;
+    color: #fff;
+}
+
+.post-actions .btn-edit:hover {
+    background: #0d47a1;
+}
+
+.post-actions .btn-delete {
+    background: #d32f2f;
+    color: #fff;
+}
+
+.post-actions .btn-delete:hover {
+    background: #b71c1c;
+}
+
+.post-actions .btn-cancel {
+    background: #aaa;
+    color: #fff;
+}
+
+.post-actions .btn-cancel:hover {
+    background: #888;
+}
+
+.comments-section {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(136, 148, 171, 0.2), 0 24px 20px -24px rgba(71, 82, 107, 0.1);
+}
+
+.comments-section h3 {
+    font-size: 22px;
+    margin-bottom: 15px;
+    color: #364670;
+}
+
+.comment-item {
+    margin-bottom: 15px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    position: relative;
+}
+
+.comment-author {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #364670;
+}
+
+.comment-content {
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: #364670;
+}
+
+.comment-meta {
+    font-size: 12px;
+    color: #999;
+}
+
+.comment-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.comment-actions .btn-edit,
+.comment-actions .btn-delete {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background 0.3s ease;
+}
+
+.comment-actions .btn-edit {
+    background: #1976d2;
+    color: #fff;
+}
+
+.comment-actions .btn-edit:hover {
+    background: #0d47a1;
+}
+
+.comment-actions .btn-delete {
+    background: #d32f2f;
+    color: #fff;
+}
+
+.comment-actions .btn-delete:hover {
+    background: #b71c1c;
+}
+
+.new-comment-form {
+    margin-top: 20px;
+}
+
+.new-comment-form h4 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #364670;
+}
+
+.new-comment-form .form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+.new-comment-form .form-group label {
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: #364670;
+}
+
+.new-comment-form .form-group textarea {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    color: #364670;
+    resize: vertical;
+}
+
+.new-comment-form .btn-submit {
+    padding: 10px 20px;
+    background: #1976d2;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s ease;
+}
+
+.new-comment-form .btn-submit:hover {
+    background: #0d47a1;
+}
+
+/* 작성일 및 수정일 스타일 */
+.post-dates {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 12px;
+    color: #999;
+}
+
+/* 댓글 작성일 및 수정일 스타일 */
+.comment-dates {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 12px;
+    color: #999;
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* SweetAlert2 커스터마이징 */
+.swal2-popup {
+    font-size: 14px;
+    width: 300px !important;
+    border-radius: 10px;
+}
+
+.swal2-title {
+    font-size: 18px;
+    color: #364670;
+}
+
+.swal2-content {
+    font-size: 14px;
+    color: #364670;
+}
+
+.swal2-confirm {
+    background-color: #1976d2 !important;
+    color: #fff !important;
+}
+
+.swal2-cancel {
+    background-color: #d32f2f !important;
+    color: #fff !important;
+}
+
+/* 이미지 선택 박스 스타일 */
+.post-image-input {
+    display: none;
+    margin-bottom: 20px;
+}
+
+.post-image-input.active {
+    display: block;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background: #f0f5fd;
+    width: 100%;
+}

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta th:name="'post-id'" th:content="${id}">
+    <title>Post View</title>
+    <link rel="stylesheet" th:href="@{/css/post.css}">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/2.5.0/remixicon.css">
+</head>
+
+<body data-post-id="${id}">
+
+<script th:src="@{/js/post.js}"></script>
+
+<div class="main">
+    <div class="post-content">
+        <div class="post-dates">
+            작성일: <span class="post-createdAt">2023-06-01</span> | 수정일: <span class="post-updatedAt">2023-06-02</span>
+        </div>
+        <h2 class="post-title">포스트 제목</h2>
+        <p class="post-meta">
+            작성자: <span class="post-author">사용자 이름</span> | 카테고리: <span class="post-category">영화</span> |
+            공개여부: <span class="post-isOpen">공개</span>
+        </p>
+        <div class="post-body">
+            <div class="post-image-container">
+                <img src="" alt="포스트 이미지" class="post-image"> <!-- 이미지가 없을 경우 빈 이미지 -->
+                <i class="ri-image-line post-image-placeholder"></i>
+            </div>
+            <input type="file" class="post-image-input" accept="image/*">
+            <p class="post-content-text">포스트 내용</p>
+        </div>
+        <div class="post-actions">
+            <button class="btn-edit" onclick="editPost()">수정</button>
+            <button class="btn-delete" onclick="deletePost()">삭제</button>
+        </div>
+    </div>
+
+
+    <div class="comments-section">
+        <h3>댓글</h3>
+        <div class="comment-list"></div>
+        <div class="new-comment-form">
+            <h4>새 댓글 작성</h4>
+            <form>
+                <div class="form-group">
+                    <label for="new-comment-content">내용</label>
+                    <textarea id="new-comment-content" name="content" rows="3" required></textarea>
+                </div>
+                <button type="button" class="btn-submit" onclick="addComment()">댓글 작성</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    console.log('post.js loaded!!!!')
+
+    document.addEventListener("DOMContentLoaded", function () {
+        console.log('DOMContentLoaded event fired!'); // 확인용 로그
+
+        initializeDynamicContent();
+    });
+
+    initializeDynamicContent();
+
+    function initializeDynamicContent() {
+        console.log('Initializing dynamic content');
+
+        const postId = document.querySelector('meta[name="post-id"]').content;
+
+        fetchPostData(postId);
+
+        const postImage = document.querySelector('.post-image');
+        const postImagePlaceholder = document.querySelector('.post-image-placeholder');
+        if (!postImage.src || postImage.src === "") {
+            postImage.style.display = 'none';
+            postImagePlaceholder.style.display = 'block';
+        } else {
+            postImage.style.display = 'block';
+            postImagePlaceholder.style.display = 'none';
+        }
+    }
+
+
+    function fetchPostData(postId) {
+        const accessToken = localStorage.getItem('accessToken');
+        const refreshToken = localStorage.getItem('refreshToken');
+
+        fetch(`/api/public/posts/${postId}`,{
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`,
+                'RefreshToken': `Bearer ${refreshToken}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.querySelector('.post-createdAt').textContent = new Date(data.createdAt).toLocaleDateString();
+                document.querySelector('.post-updatedAt').textContent = new Date(data.updatedAt).toLocaleDateString();
+                document.querySelector('.post-title').textContent = data.title;
+                document.querySelector('.post-author').textContent = data.userId;
+                document.querySelector('.post-category').textContent = data.categoryName;
+                document.querySelector('.post-isOpen').textContent = data.open ? '공개' : '비공개';
+                document.querySelector('.post-content-text').textContent = data.content;
+
+                // 이미지 URL 설정
+                const postImage = document.querySelector('.post-image');
+                const postImagePlaceholder = document.querySelector('.post-image-placeholder');
+                if (data.storedFilename) {
+                    postImage.src = `/images/${data.storedFilename}`;
+                    postImage.style.display = 'block';
+                    postImagePlaceholder.style.display = 'none';
+                } else {
+                    postImage.style.display = 'none';
+                    postImagePlaceholder.style.display = 'block';
+                }
+
+                const commentList = document.querySelector('.comment-list');
+                commentList.innerHTML = '';
+                data.comments.forEach(comment => {
+                    const commentItem = document.createElement('div');
+                    commentItem.classList.add('comment-item');
+                    commentItem.id = `comment-${comment.id}`;
+                    commentItem.innerHTML = `
+                        <div class="comment-dates">
+                            작성일: <span class="comment-createdAt">${new Date(comment.createdAt).toLocaleDateString()}</span> | 수정일: <span class="comment-updatedAt">${new Date(comment.updatedAt).toLocaleDateString()}</span>
+                        </div>
+                        <p class="comment-author">${comment.userId}</p>
+                        <p class="comment-content">${comment.content}</p>
+                        <div class="comment-actions">
+                            <button class="btn-edit" onclick="editComment(${comment.id})">수정</button>
+                            <button class="btn-delete" onclick="deleteComment(${comment.id})">삭제</button>
+                        </div>
+                    `;
+                    commentList.appendChild(commentItem);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching post data:', error);
+                Swal.fire('포스트를 불러오는 중 오류가 발생했습니다.', '', 'error');
+            });
+    }
+
+    function editPost() {
+        // 초기 상태 저장
+        const initialPostTitle = document.querySelector('.post-title').innerText;
+        const initialPostImageSrc = document.querySelector('.post-image').src;
+        const initialPostContentText = document.querySelector('.post-content-text').innerText;
+
+        const postTitle = document.querySelector('.post-title');
+        const postImage = document.querySelector('.post-image');
+        const postImageInput = document.querySelector('.post-image-input');
+        const postContentText = document.querySelector('.post-content-text');
+        const btnEdit = document.querySelector('.btn-edit');
+        const btnDelete = document.querySelector('.btn-delete');
+
+        btnDelete.style.display = 'none';
+
+        postTitle.outerHTML = `<input type="text" class="post-title" value="${postTitle.innerText}">`;
+        postImageInput.classList.add('active');
+        postContentText.outerHTML = `<textarea class="post-content-text" rows="10">${postContentText.innerText}</textarea>`;
+
+        btnEdit.innerText = '수정 완료';
+        btnEdit.onclick = async function () {
+            const newPostTitle = document.querySelector('.post-title').value;
+            const newPostImage = document.querySelector('.post-image-input').files[0];
+            const newPostContentText = document.querySelector('.post-content-text').value;
+
+            const postId = document.querySelector('meta[name="post-id"]').content;
+
+            const formData = new FormData();
+            formData.append('postRequest', new Blob([JSON.stringify({
+                title: newPostTitle,
+                content: newPostContentText,
+                isOpen: document.querySelector('.post-isOpen').textContent === '공개'
+            })], { type: 'application/json' }));
+
+            if (newPostImage) {
+                formData.append('imageFile', newPostImage);
+            }
+
+            const accessToken = localStorage.getItem('accessToken');
+            const refreshToken = localStorage.getItem('refreshToken');
+
+            fetch(`/api/public/posts/${postId}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'RefreshToken': `Bearer ${refreshToken}`
+                },
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // 서버에서 반환된 최신 데이터를 사용하여 페이지 업데이트
+                    document.querySelector('.post-title').outerHTML = `<h2 class="post-title">${data.title}</h2>`;
+                    if (data.storedFilename) {
+                        document.querySelector('.post-image').src = `/images/${data.storedFilename}`;
+                        document.querySelector('.post-image').style.display = 'block';
+                        document.querySelector('.post-image-placeholder').style.display = 'none';
+                    }
+                    document.querySelector('.post-content-text').outerHTML = `<p class="post-content-text">${data.content}</p>`;
+
+                    btnEdit.innerText = '수정';
+                    btnEdit.onclick = editPost;
+
+                    btnDelete.style.display = 'inline';
+                    postImageInput.classList.remove('active');
+
+                    // btnCancel 버튼 숨기기
+                    const btnCancel = document.querySelector('.btn-cancel');
+                    if (btnCancel) {
+                        btnCancel.style.display = 'none';
+                    }
+
+                    Swal.fire('포스트가 수정되었습니다.', '', 'success');
+                })
+                .catch(error => {
+                    console.error('Error updating post:', error);
+                    Swal.fire('포스트 수정 중 오류가 발생했습니다.', '', 'error');
+                });
+        };
+
+        const btnCancel = document.createElement('button');
+        btnCancel.innerText = '취소';
+        btnCancel.classList.add('btn-cancel');
+        btnCancel.onclick = function () {
+            // 페이지를 원래 상태로 복원
+            document.querySelector('.post-title').outerHTML = `<h2 class="post-title">${initialPostTitle}</h2>`;
+            document.querySelector('.post-image').src = initialPostImageSrc;
+            document.querySelector('.post-content-text').outerHTML = `<p class="post-content-text">${initialPostContentText}</p>`;
+
+            btnEdit.innerText = '수정';
+            btnEdit.onclick = editPost;
+
+            btnDelete.style.display = 'inline';
+            postImageInput.classList.remove('active');
+
+            // btnCancel 버튼 제거
+            btnCancel.remove();
+        };
+        document.querySelector('.post-actions').appendChild(btnCancel);
+    }
+
+    function deletePost() {
+        const accessToken = localStorage.getItem('accessToken');
+        const refreshToken = localStorage.getItem('refreshToken');
+        const postId = document.querySelector('meta[name="post-id"]').content;
+
+        Swal.fire({
+            title: '정말로 이 포스트를 삭제하시겠습니까?',
+            text: '다시 되돌릴 수 없습니다. 신중하세요.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: '삭제',
+            cancelButtonText: '취소',
+        }).then(result => {
+            if (result.isConfirmed) {
+                fetch(`/api/public/posts/${postId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'RefreshToken': `Bearer ${refreshToken}`
+                    }
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            Swal.fire('포스트가 삭제되었습니다.', '', 'success').then(() => {
+                                window.location.href = '/'; // 메인 페이지로 리디렉션
+                            });
+                        } else {
+                            throw new Error('Failed to delete post');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error deleting post:', error);
+                        Swal.fire('포스트 삭제 중 오류가 발생했습니다.', '', 'error');
+                    });
+            }
+        });
+    }
+
+    /// 댓글 기능
+
+    function addComment(event) {
+        const accessToken = localStorage.getItem('accessToken');
+        const refreshToken = localStorage.getItem('refreshToken');
+
+        const postId = document.querySelector('meta[name="post-id"]').content;
+        const content = document.getElementById('new-comment-content').value;
+
+        fetch(`/api/comments/post/${postId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`,
+                'RefreshToken': `Bearer ${refreshToken}`
+            },
+            body: JSON.stringify({ content })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === '401' || data.error == "Unauthorized") return;
+                const commentList = document.querySelector('.comment-list');
+                const commentItem = document.createElement('div');
+                commentItem.classList.add('comment-item');
+                commentItem.id = `comment-${data.id}`;
+                commentItem.innerHTML = `
+                    <div class="comment-dates">
+                        작성일: <span class="comment-createdAt">${new Date(data.createdAt).toLocaleDateString()}</span> | 수정일: <span class="comment-updatedAt">${new Date(data.updatedAt).toLocaleDateString()}</span>
+                    </div>
+                    <p class="comment-author">${data.userId}</p>
+                    <p class="comment-content">${data.content}</p>
+                    <div class="comment-actions">
+                        <button class="btn-edit" onclick="editComment(${data.id})">수정</button>
+                        <button class="btn-delete" onclick="deleteComment(${data.id})">삭제</button>
+                    </div>
+                    `;
+                commentList.appendChild(commentItem);
+
+                // 댓글 작성 폼 초기화
+                document.getElementById('new-comment-content').value = '';
+
+                Swal.fire('댓글이 작성되었습니다.', '', 'success');
+            })
+            .catch(error => {
+                console.error('Error adding comment:', error);
+                Swal.fire('댓글 작성 중 오류가 발생했습니다.', '', 'error');
+            });
+    }
+
+    function editComment(commentId) {
+        const commentItem = document.getElementById(`comment-${commentId}`);
+        const commentContent = commentItem.querySelector('.comment-content');
+
+        Swal.fire({
+            title: '댓글을 수정하세요:',
+            input: 'textarea',
+            inputValue: commentContent.innerText,
+            showCancelButton: true,
+            confirmButtonText: '수정 완료',
+            cancelButtonText: '취소'
+        }).then(result => {
+            if (result.isConfirmed) {
+                const accessToken = localStorage.getItem('accessToken');
+                const refreshToken = localStorage.getItem('refreshToken');
+
+                fetch(`/api/comments/${commentId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`,
+                        'RefreshToken': `Bearer ${refreshToken}`
+                    },
+                    body: JSON.stringify({ content: result.value })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === '401' || data.error == "Unauthorized") return;
+                        commentContent.innerText = data.content; // 서버에서 반환된 최신 데이터를 사용
+                        Swal.fire('댓글이 수정되었습니다.', '', 'success');
+                    })
+                    .catch(error => {
+                        console.error('Error updating comment:', error);
+                        Swal.fire('댓글 수정 중 오류가 발생했습니다.', '', 'error');
+                    });
+            }
+        });
+    }
+
+    function deleteComment(commentId) {
+        Swal.fire({
+            title: '정말로 이 댓글을 삭제하시겠습니까?',
+            text: '다시 되돌릴 수 없습니다. 신중하세요.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: '삭제',
+            cancelButtonText: '취소',
+        }).then(result => {
+            if (result.isConfirmed) {
+                const accessToken = localStorage.getItem('accessToken');
+                const refreshToken = localStorage.getItem('refreshToken');
+
+                fetch(`/api/comments/${commentId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'RefreshToken': `Bearer ${refreshToken}`
+                    },
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            const commentItem = document.getElementById(`comment-${commentId}`);
+                            commentItem.remove();
+                            Swal.fire('댓글이 삭제되었습니다.', '', 'success');
+                        } else {
+                            throw new Error('Network response was not ok.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error deleting comment:', error);
+                        Swal.fire('댓글 삭제 중 오류가 발생했습니다.', '', 'error');
+                    });
+            }
+        });
+    }
+
+
+
+</script>
+
+</body>
+</html>

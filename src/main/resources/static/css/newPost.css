@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap');
+
+/* 기본 스타일 설정 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+body {
+    display: flex;
+    height: 100vh;
+    background: #f0f5fd;
+}
+
+.main {
+    flex-grow: 1;
+    padding: 25px;
+    overflow-y: auto; /* 스크롤이 생기도록 설정 */
+}
+
+.new-post-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(136, 148, 171, 0.2), 0 24px 20px -24px rgba(71, 82, 107, 0.1);
+    margin-bottom: 20px;
+}
+
+.new-post-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #364670;
+}
+
+.new-post-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: #364670;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    color: #364670;
+}
+
+.form-group textarea {
+    resize: vertical; /* 텍스트 영역 크기 조정 가능 */
+}
+
+.btn-submit {
+    padding: 10px 20px;
+    background: #1976d2;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s ease;
+}
+
+.btn-submit:hover {
+    background: #0d47a1;
+}

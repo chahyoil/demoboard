@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  postgres:
+    build:
+      context: .
+      dockerfile: docker/postgresql/Dockerfile
+    container_name: demoboard_postgres
+    ports:
+      - "5433:5432" # 호스트에도 postgreSQL 이 설치되어 있어서 +1
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mypostgres
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - demoboard_network
+
+  redis:
+    image: redis:latest
+    container_name: demoboard_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - demoboard_network
+
+  spring:
+    build:
+      context: .
+      dockerfile: docker/spring/Dockerfile
+    container_name: demoboard_spring
+    ports:
+      - "8080:8080"
+      - "5005:5005"  # 디버그 포트 설정
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://demoboard_postgres:5432/postgres
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: mypostgres
+      SPRING_REDIS_HOST: demoboard_redis
+      SPRING_REDIS_PORT: 6379
+      SPRING_PROFILES_ACTIVE: default  # 기본 프로파일 사용
+      SPRING_JAVA_OPTS: "-Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+    volumes:
+      - spring_data:/app/userData
+      - ./logs:/app/logs
+    networks:
+      - demoboard_network
+
+networks:
+  demoboard_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  spring_data:
+  spring_logs:

@@ -1,0 +1,61 @@
+spring:
+  profiles:
+    active: default
+  datasource:
+    url: jdbc:postgresql://demoboard_postgres:5432/postgres
+    username: postgres
+    password: mypostgres
+    driver-class-name: org.postgresql.Driver
+  data:
+    redis:
+      host: ${SPRING_REDIS_HOST}
+      port: ${SPRING_REDIS_PORT}
+  jpa:
+    hibernate:
+      ddl-auto: none
+    #    show-sql: false
+    properties:
+      hibernate:
+        format_sql: none
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    defer-datasource-initialization: true
+
+  h2:
+    console:
+      enabled: true
+  main:
+    allow-bean-definition-overriding: true
+  thymeleaf:
+    prefix: classpath:/templates/views/
+    suffix: .html
+  web:
+    resources:
+      static-locations: classpath:/static/
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+server:
+  port: 8080
+
+jwt:
+  issuer: chahyoil@gmail.com
+  secret-key: d5ZpG/1fE3ATe0WCxNmbYBRhF2G7/Hxf5dtlH/IJacyS8ChIA2wI+3WdKIk2cY3X5idBtSKo5hwZd6CNYyIe7A==
+
+# Logging
+logging:
+  file:
+    path: /app/logs
+  level:
+#    root: DEBUG
+#    org.springframework: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.springframework.data.jpa.repository.query: DEBUG
+
+upload:
+  path: /app/userData/
+
+cdn:
+  url: http://localhost:8081
