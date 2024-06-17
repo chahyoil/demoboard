@@ -48,9 +48,11 @@
 
 - 스프링 부트를 사용
 - PostgreSQL을 데이터베이스로 사용
+  - plpython3u 를 이용해서 sql문 내에서 암호화 적용
 - Security JWT를 적용
 - Testing: JUnit 5를 사용
 - Redis를 데이터 캐싱으로 활용
+  - 유저 로그아웃시 : access token 블랙리스트 등록
 - Docker를 사용
 - JPA를 데이터베이스 연동에 사용
 
