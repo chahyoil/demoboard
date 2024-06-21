@@ -37,7 +37,7 @@
 
 ## 프로젝트 디렉토리 구조
 
-- docker: 여러 도커 파일들을 관리하기 위함입니다.
+- docker: 여러 도커 파일들을 관리(postgresql 및 spring)
 - images: 프로젝트 내용 소개용 이미지를 모아두었습니다.
     - dall-e-imags: 정해진 프롬프트 템플릿을 사용해서 생성형 AI로 생성한 이미지들입니다.
 - logs: 스프링 및 DB 등 로깅 관련 파일들입니다(추후 구현 예정).
@@ -55,7 +55,6 @@
   - 유저 로그아웃시 : access token 블랙리스트 등록
 - Security JWT를 적용
 - Testing: JUnit 5를 사용
-- Redis를 데이터 캐싱으로 활용
 - Docker를 사용
 - JPA를 데이터베이스 연동에 사용
 
@@ -108,7 +107,7 @@
 
 ### 환경 설정
 
-환경별 설정은 `application.yml`과 `application.properties` 파일에 정의 주요 설정에는 데이터베이스 연결 정보, Redis 설정, JWT 설정 등이 포함되어 있습니다.
+환경별 설정은 `application.yml` 파일에 정의 주요 설정에는 데이터베이스 연결 정보, Redis 설정, JWT 설정 등이 포함되어 있습니다.
 
 ## 더미 데이터 생성
 
